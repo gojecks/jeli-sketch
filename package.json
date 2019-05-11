@@ -1,0 +1,33 @@
+{
+    "name": "jeli.sketch",
+    "version": "0.1.0",
+    "description": "Interractive sketch written in javascript",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "grunt"
+    },
+    "files": [
+        "dist",
+        "@types",
+        "server"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/gojecks/jeli.sketch.git"
+    },
+    "keywords": [
+        "Sketch",
+        "Javascript",
+        "Sketch",
+        "drawing",
+        "interractive",
+        "sketch"
+    ],
+    "author": "Joseph Gojecks",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/gojecks/jeli.sketch/issues"
+    },
+    "homepage": "https://github.com/gojecks/jeli.sketch#readme"
+}

@@ -1,0 +1,8 @@
+test:
+  - 'karma'
+default:
+  #clear and generate common libraries
+  - 'clean' 
+  - 'jeli-template-loader'
+  - 'uglify'
+  - 'watch'
