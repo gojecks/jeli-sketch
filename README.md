@@ -31,6 +31,6 @@ Minimal javascript framework for drawing or signing signatures.
         .watch();
  ```
  
- ## And that's all folks
+ ### And that's all folks
 
 
