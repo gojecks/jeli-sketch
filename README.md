@@ -33,4 +33,4 @@ Minimal javascript framework for drawing or signing signatures.
  
  ### And that's all folks
 
-[Playground ](https://gojecks.github.io/jeli-sketch/playground)
+[Playground ](https://gojecks.github.io/jeli.sketch/playground/)
