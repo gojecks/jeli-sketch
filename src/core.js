@@ -11,10 +11,10 @@
         currX = 0,
         prevY = 0,
         currY = 0,
-        dot_flag = false;
-
-    var canvasDrawingX = "black",
-        canvasDrawingY = 2;
+        fillStyle = "black",
+        lineWidth = 2,
+        eraserMode = false,
+        currentRandomColor = "";
 
     function Sketch(options, dropZone) {
         var defaultOptions = {
@@ -53,10 +53,11 @@
      */
     function publicApi() {
         // default colors
-        this.colors = ["black", "green", "blue", "red", "orange", "white", "gray", "purple"];
+        this.colors = ["random", "black", "green", "blue", "red", "orange", "white", "gray", "purple"];
         this.size = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20];
         this.stack = [];
         this._events = {};
+        this.shapes = new shapes(this);
     };
     /**
      * @method: addColor
@@ -71,20 +72,15 @@
 
     publicApi.prototype.setPenSize = function(size) {
         if (size === 'default') {
-            canvasDrawingY = 2;
+            lineWidth = 2;
         } else {
-            canvasDrawingY = parseInt(size);
+            lineWidth = parseInt(size);
         }
     }
 
     publicApi.prototype.setColor = function(color) {
-        if (this.colors.indexOf(color) > -1 || color === 'white') {
-            canvasDrawingX = color;
-            if (color === "white") {
-                canvasDrawingY = 14;
-            } else {
-                canvasDrawingY = 2;
-            }
+        if (this.colors.indexOf(color) > -1) {
+            fillStyle = color;
         }
 
         return this;
@@ -97,7 +93,7 @@
         }
     };
 
-    publicApi.prototype.erase = function() {
+    publicApi.prototype.clear = function() {
         eraseCanvas.call(this);
         this.stack.push({
             event: "clear"
@@ -105,6 +101,10 @@
         this.trigger('interact.send');
         this.stack = [];
     };
+
+    publicApi.prototype.eraser = function() {
+        eraserMode = !eraserMode;
+    }
 
     publicApi.prototype.init = function(CB) {
         var _self = this;
@@ -147,19 +147,26 @@
     }
 
 
-    function draw(prevX, prevY, currX, currY, x, y, pushToStack) {
+    function draw(prevX, prevY, currX, currY, strokeStyle, lineWidth, pushToStack) {
         this.ctx.beginPath();
-        this.ctx.moveTo(prevX, prevY);
-        this.ctx.lineTo(currX, currY);
-        this.ctx.strokeStyle = x;
-        this.ctx.lineWidth = y;
-        this.ctx.stroke();
+        if (eraserMode) {
+            erase.call(this);
+        } else {
+            this.ctx.globalCompositeOperation = "source-over";
+            this.ctx.moveTo(prevX, prevY);
+            this.ctx.lineTo(currX, currY);
+            this.ctx.strokeStyle = strokeStyle;
+            this.ctx.lineWidth = lineWidth;
+            this.ctx.stroke();
+        }
+
+        this.ctx.lineCap = 'round';
         this.ctx.closePath();
 
         // push the result to stack
         if (pushToStack) {
             this.stack.push({
-                arg: [prevX, prevY, currX, currY, x, y, false],
+                arg: [prevX, prevY, currX, currY, strokeStyle, lineWidth, false],
                 event: "draw"
             });
         }
@@ -167,28 +174,41 @@
         this.trigger('interact.send');
     }
 
-    function pencilOnBoard(x, currX, currY, pushToStack) {
+    /**
+     * 
+     * @param {*} fillStyle 
+     * @param {*} currX 
+     * @param {*} currY 
+     * @param {*} pushToStack 
+     */
+    function pencilOnBoard(fillStyle, currX, currY, pushToStack) {
         this.ctx.beginPath();
-        this.ctx.fillStyle = x;
-        this.ctx.fillRect(currX, currY, 2, 2);
+        this.ctx.fillStyle = fillStyle;
+        if (eraserMode) {
+            erase.call(this);
+        } else {
+            this.ctx.fillRect(currX, currY, 2, 2);
+        }
         this.ctx.closePath();
-
-
         if (pushToStack) {
             this.stack.push({
                 event: "pencilOnBoard",
-                arg: [x, currX, currY]
+                arg: [fillStyle, currX, currY]
             });
         }
 
         this.trigger('interact.send');
     }
 
+    function erase() {
+        this.ctx.globalCompositeOperation = "destination-out";
+        this.ctx.arc(currX, currY, 8, 0, Math.PI * 2, false);
+        this.ctx.fill();
+    }
 
 
-
-    publicApi.prototype.getDataURL = function(CB) {
-        var dataURL = this.canvas.toDataURL();
+    publicApi.prototype.getDataURL = function(CB, mimeType) {
+        var dataURL = this.canvas.toDataURL(mimeType || "image/png");
         // trigger our callback
         (CB || function() {})(dataURL);
     };
@@ -210,7 +230,6 @@
 
     function findxy(e) {
         var canvas = this.canvas,
-            ctx = this.ctx,
             _ev = getMouseEvent(e);
         switch (e.type) {
             case ('mousedown'):
@@ -219,18 +238,15 @@
                 prevY = currY;
                 currX = _ev.clientX - canvas.offsetLeft;
                 currY = _ev.clientY - canvas.offsetTop;
-
                 flag = true;
-                dot_flag = true;
-                if (dot_flag) {
-                    pencilOnBoard.apply(this, [canvasDrawingX, currX, currY, true]);
-                    dot_flag = false;
-                }
+                pencilOnBoard.apply(this, [getStyle(true), currX, currY, true]);
                 break;
             case ('mouseout'):
             case ('mouseup'):
             case ('touchend'):
                 flag = false;
+                prevX = currX;
+                prevY = currY;
                 break;
             case ('mousemove'):
             case ('touchmove'):
@@ -239,11 +255,30 @@
                     prevY = currY;
                     currX = _ev.clientX - canvas.offsetLeft;
                     currY = _ev.clientY - canvas.offsetTop;
-                    draw.apply(this, [prevX, prevY, currX, currY, canvasDrawingX, canvasDrawingY, true]);
+                    draw.apply(this, [prevX, prevY, currX, currY, getStyle(false), lineWidth, true]);
                 }
                 break;
         }
 
+    }
+
+    function rgb() {
+        color = 'rgb(';
+        for (var i = 0; i < 3; i++) {
+            color += Math.floor(Math.random() * 255) + ',';
+        }
+        return color.replace(/\,$/, ')');
+    }
+
+    function getStyle(changeColor) {
+        if (fillStyle === "random") {
+            if (changeColor) {
+                currentRandomColor = rgb();
+            }
+            return currentRandomColor
+        } else {
+            return fillStyle;
+        }
     }
 
     function $on(evName, fn) {

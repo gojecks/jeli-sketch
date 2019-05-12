@@ -55,6 +55,7 @@ function start(ip) {
     deviceInfo.height = dropZone.clientHeight;
     deviceInfo.width = dropZone.clientWidth;
     drawingBoard = new jsketch(deviceInfo, dropZone);
+    drawingBoard.ctx.fillStyle = "green";
     if (window.io) {
         socket = io.connect(ip);
         // broadcast
@@ -97,6 +98,10 @@ function buildColorPicker(list, _pickerZone) {
     });
     _pickerZone.innerHTML = option;
     option = "";
+}
+
+function capture() {
+    drawingBoard.getDataURL(console.log);
 }
 
 
