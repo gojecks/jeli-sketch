@@ -1,6 +1,6 @@
 {
     "name": "jeli.sketch",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "Interractive sketch written in javascript",
     "main": "index.js",
     "scripts": {
