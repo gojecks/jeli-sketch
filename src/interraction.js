@@ -17,19 +17,11 @@ function interaction(parent) {
         timer: 500
     };
 
-    this.helpers = {
-        draw: draw,
-        pencilOnBoard: pencilOnBoard,
-        clear: eraseCanvas
-    };
-
-    parent.$on('interact.send', function() {
+    parent.$on('interact.send', function(stack) {
         self.sendEvent('interaction.stack.received', {
             user: parent.options.id,
-            stack: parent.stack.concat()
+            stack: stack
         });
-        // clear parent stack after sending
-        parent.stack = [];
     });
 
     // set socket
@@ -107,7 +99,7 @@ interaction.prototype.draw = function(obj) {
     }
 
     obj.stack.forEach(function(item) {
-        _self.helpers[item.event].apply(_userFrame, item.arg);
+        Sketch[item.event].apply(_userFrame, item.arg);
     });
 };
 

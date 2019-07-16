@@ -4,7 +4,7 @@ module.exports = {
     },
     session: {
         dest: '<%= dir %>dist/jeli.sketch.js',
-        src: ['<%= dir %>src/*.js', '<%= dir %>../jeli.helpers/extend.js'],
+        src: ['<%= dir %>src/**/*.js', '<%= dir %>../jeli.helpers/extend.js'],
         options: {
             wrap: {
                 type: 'UMD',

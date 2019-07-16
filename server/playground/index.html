@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+
+<HEAD>
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'"> -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+    <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <META http-equiv="X-UA-Compatible" content="IE=8">
+    <TITLE>Drawing Page</TITLE>
+    <!-- <script src="https://unpkg.com/jeli.sketch@0.2.0/dist/jeli.sketch.min.js" crossorigin></script> -->
+    <!-- <script src="../../dist/jeli.sketch.min.js"></script> -->
+    <script src="../jeli.sketch.min.js"></script>
+    <link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="../socket.io/socket.io.js"></script>
+</HEAD>
+<style>
+    .page_drop {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0px;
+        background: #fff;
+        left: 0px;
+    }
+    
+    .page_drop .title {
+        padding: 10px;
+        background-color: #DDD;
+        color: #000;
+        text-align: center;
+    }
+    
+    .page_drop #drawingBoard {
+        width: 100%;
+        height: 80vh;
+        border: 1px solid #AAA;
+        margin: 0px auto;
+    }
+    
+    .connectWrapper {
+        position: relative;
+        margin-top: 25%
+    }
+</style>
+
+<BODY>
+    <div class="container">
+        <div class="page_drop" id="page_drop" style="display: none">
+            <div class="title">
+                <h1 id="connectorName"></h1>
+            </div>
+            <div id="drawingBoard"></div>
+            <div class="row ">
+                <div class="col-sm-10 col-sm-offset-1">
+                    <button class="btn btn-default" onclick="drawingBoard.colorPicker()"><span class="fa fa-palette"></span></button>
+                    <select onchange="drawingBoard.setPenSize(this.value)" id="_sizePicker"></select>
+                    <button class="btn btn-default" onclick="drawingBoard.drawArrow('T')"><span class="fa fa-long-arrow-alt-left"></span></button>
+                    <button class="btn btn-default" onclick="drawingBoard.drawArrow('TB')"><span class="fa fa-arrows-alt-h"></span></button>
+                    <button class="btn btn-default" onclick="drawingBoard.drawArrow('B')"><span class="fa fa-long-arrow-alt-right"></span></button>
+                    <button class="btn btn-default" onclick="drawingBoard.freeHand()"><span class="fa fa-pen-alt"></span></button>
+                    <button class="btn btn-default" onclick="text()"><span class="fa fa-font"></span></button>
+                    <button class="btn btn-default" onclick="image()"><span class="fa fa-images"></span></button>
+                    <button class="btn btn-default" onclick="drawingBoard.drawCircle('stroke', 'f')"><span class="fa fa-circle"></span></button>
+                    <button class="btn btn-default" onclick="drawingBoard.drawRect('stroke')"><span class="fa fa-stop"></span></button>
+                    <button class="btn btn-default" onclick="drawingBoard.drawLine()"><span class="fa fa-slash"></span></button>
+                    <button class="btn btn-default" onclick="drawingBoard.eraser()"><span class="fa fa-eraser"></span></button>
+                    <button class="btn btn-default" onclick="drawingBoard.select()"><span class="fa fa-mouse-pointer"></span></button>
+                    <button class="btn btn-default" onclick="drawingBoard.dragSelect()"><span class="fa fa-arrows-alt"></span></button>
+                    <button class="btn btn-default" onclick="drawingBoard.fill(1)"><span class="fa fa-fill"></span></button>
+                    <button class="btn btn-default" onclick="drawingBoard.clear()"><span class="fa fa-trash"></span></button>
+                    <button class="btn btn-default" onclick="undo()"><span class="fa fa-undo"></span></button>
+                    <button class="btn btn-default" onclick="capture()"><span class="fa fa-save"></span></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="connectWrapper" id="connectWrapper">
+            <div class="row">
+                <div class="col-sm-4 col-sm-offset-4 form-group">
+                    <input id="IP" placeholder="Please Enter Socket IP" class="form-control">
+                </div>
+                <div class="col-sm-4 col-sm-offset-4 form-group">
+                    <input id="userName" placeholder="UserName" class="form-control">
+                </div>
+                <div class="col-sm-4 col-sm-offset-4">
+                    <input type="button" id="start" onclick="connectUser()" class="btn btn-primary form-control col-sm-12" placeholder="Please Enter Socket Host" value="Connect">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="./app.js" type="text/javascript"></script>
+</BODY>
+
+</HTML>

@@ -1,3 +1,4 @@
+"use strict";
 var connectorName,
     connectWrapper,
     ip,
@@ -8,6 +9,7 @@ var connectorName,
     _sizePicker,
     drawingBoard,
     deviceInfo,
+    _arrowPicker,
     socket;
 
 function build() {
@@ -17,8 +19,11 @@ function build() {
     canvasPage = document.getElementById('page_drop');
     userName = document.getElementById('userName');
     dropZone = document.getElementById("drawingBoard");
-    _colorPicker = document.getElementById("_colorPicker");
     _sizePicker = document.getElementById("_sizePicker");
+    _arrowPicker = document.getElementById("_arrowPicker");
+
+    // set the IP value
+    ip.value = location.protocol + "//" + location.host;
 
     deviceInfo = {
         id: "_childView:" + +new Date
@@ -66,8 +71,8 @@ function start(ip) {
 
 
     drawingBoard.init(function() {
-        buildColorPicker(drawingBoard.colors, _colorPicker);
-        buildColorPicker(drawingBoard.size, _sizePicker);
+        buildPickers(drawingBoard.size, _sizePicker);
+        //buildPickers(drawingBoard.arrowPositions, _arrowPicker);
         if (window.io) {
             startInterraction();
         }
@@ -91,7 +96,7 @@ function startInterraction() {
     });
 }
 
-function buildColorPicker(list, _pickerZone) {
+function buildPickers(list, _pickerZone) {
     var option = "";
     list.forEach(function(color) {
         option += '<option value="' + color + '" style="background:' + color + '" ' + ((color === 'black') ? 'selected="true"' : "") + '>' + color + '</option>';
@@ -102,6 +107,37 @@ function buildColorPicker(list, _pickerZone) {
 
 function capture() {
     drawingBoard.getDataURL(console.log);
+}
+
+function text() {
+    drawingBoard.addText({
+        fontSize: 50
+            // gradient: [{
+            //     point: "0",
+            //     color: "magenta"
+            // }, {
+            //     point: "0.5",
+            //     color: "blue"
+            // }, {
+            //     point: "1.0",
+            //     color: "red"
+            // }]
+    });
+}
+
+
+function image() {
+    var imagePath = prompt('enter image path');
+    if (imagePath) {
+        drawingBoard.addImage({
+            img: imagePath,
+            dragable: true
+        });
+    }
+}
+
+function undo() {
+    drawingBoard.undo();
 }
 
 
